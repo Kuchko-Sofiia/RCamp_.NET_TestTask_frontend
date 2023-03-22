@@ -1,29 +1,44 @@
-<div class="form">
-  <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" class="form-control" id="email" formControlName="email">
-      <div *ngIf="myForm.controls['email'].invalid && (myForm.controls['email'].dirty || myForm.controls['email'].touched)" class="alert alert-danger">
-        <div *ngIf="myForm.controls['email'].errors?.['required']">
-          Email is required.
-        </div>
-        <div *ngIf="myForm.controls['email'].errors?.['email']">
-          Invalid email format.
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="file">File</label>
-      <input type="file" class="form-control" id="file" formControlName="file" (change)="onFileSelected($event)">
-      <div *ngIf="myForm.controls['file'].invalid && (myForm.controls['file'].dirty || myForm.controls['file'].touched)" class="alert alert-danger">
-        <div *ngIf="myForm.controls['file'].errors?.['required']">
-          File is required.
-        </div>
-        <div *ngIf="myForm.controls['file'].errors?.['invalidExtension']">
-          Only .docx files are allowed.
+<div class="form-block">
+  <div class="form-title-block">
+    <h2>Welcome to the test task!</h2>
+    <p>This application contains a form for entering mail and selecting a file that will be sent to the blob storage.</p>
+    <p>Upon successful upload of the file, you will receive an email notification confirming that the process has been completed.</p>
+  </div>
+  <div class="form-container" *ngIf="!isUploaded">
+    <h2>Try the form below!</h2>
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit()" class="my-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" [formControl]="emailControl" class="email-input">
+        <div *ngIf="emailControl?.invalid && (emailControl?.dirty || emailControl?.touched)" class="alert">
+          <div *ngIf="emailControl?.errors?.['required']">• Email is required</div>
+          <div *ngIf="emailControl?.errors?.['email']">• Invalid email format</div>
         </div>
       </div>
-    </div>
-    <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid">Submit</button>
-  </form>
+      <div class="form-group">
+        <label for="file">File</label>
+        <input type="file" class="file-input" id="file" [formControl]="fileControl" (change)="onFileSelected($event)">
+        <div *ngIf="fileControl.invalid && (fileControl.dirty || fileControl.touched)" class="alert">
+          <div *ngIf="fileControl.errors?.['required']">• File is required</div>
+          <div *ngIf="fileControl.errors?.['invalidExtension']">• Only .docx files are allowed</div>
+        </div>
+      </div>
+      <div *ngIf="errors" class="alert">
+        <div *ngFor="let error of errors" >• {{ error }}</div>
+      </div>
+      <button type="submit" class="btn" [disabled]="myForm.invalid">Submit</button>
+    </form>
+  </div>
+  <div class="form-container" *ngIf="isUploaded">
+    <h4>Your file has been successfully uploaded to the storage.</h4>
+    <h4>You will soon receive a notification via email confirming that the uploading was successful.</h4>
+    <button type="submit" class="btn" (click)="goBack()">Back</button>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="spinner-background">
+  <div>
+      <h2>File is uploading to the storage...</h2>
+      <div class="spinner"></div>
+  </div>
 </div>
